@@ -71,27 +71,52 @@ export const createConfetti = (container: HTMLElement, count = 50) => {
 
 /**
  * Custom hook for scroll-triggered animations
+ * Modified to prevent flickering when elements enter the viewport
  */
 export const useScrollAnimation = () => {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    // Pre-apply the animate-fade-in class with opacity-0
+    const elements = document.querySelectorAll('.scroll-animate');
+    elements.forEach((el) => {
+      // Add a class that sets initial state with no transition
+      el.classList.add('opacity-0');
+    });
+
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      elements.forEach((el) => {
+        // Check if the element is already in the viewport on page load
+        const rect = el.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight - 100;
+        
+        if (isVisible) {
+          el.classList.remove('opacity-0');
+          el.classList.add('animate-fade-in');
+        }
+      });
+    }, 50);
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
       
       const elements = document.querySelectorAll('.scroll-animate');
       elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight - 100;
-        
-        if (isVisible) {
-          el.classList.add('animate-fade-in');
+        // Only apply animation if it hasn't been animated yet
+        if (!el.classList.contains('animate-fade-in')) {
+          const rect = el.getBoundingClientRect();
+          const isVisible = rect.top < window.innerHeight - 100;
+          
+          if (isVisible) {
+            el.classList.remove('opacity-0');
+            el.classList.add('animate-fade-in');
+          }
         }
       });
     };
     
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
