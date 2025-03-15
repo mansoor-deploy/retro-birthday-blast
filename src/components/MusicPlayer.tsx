@@ -1,22 +1,25 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const playlist = [
   {
     title: "Take On Me",
     artist: "a-ha",
-    src: "https://example.com/music/take-on-me.mp3" // Replace with actual audio URL
+    src: "/audio/take-on-me.mp3" // Updated with local audio path
   },
   {
     title: "Billie Jean",
     artist: "Michael Jackson",
-    src: "https://example.com/music/billie-jean.mp3" // Replace with actual audio URL
+    src: "/audio/billie-jean.mp3" // Updated with local audio path
   },
   {
     title: "Sweet Dreams",
     artist: "Eurythmics",
-    src: "https://example.com/music/sweet-dreams.mp3" // Replace with actual audio URL
+    src: "/audio/sweet-dreams.mp3" // Updated with local audio path
   }
 ];
 
@@ -26,6 +29,8 @@ export function MusicPlayer() {
   const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [songSuggestion, setSongSuggestion] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -117,6 +122,14 @@ export function MusicPlayer() {
       setIsMuted(false);
     }
   };
+
+  const handleSuggestionSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (songSuggestion.trim()) {
+      setSuggestions(prev => [...prev, songSuggestion.trim()]);
+      setSongSuggestion('');
+    }
+  };
   
   return (
     <div className="glass-card p-4 max-w-sm mx-auto">
@@ -190,6 +203,47 @@ export function MusicPlayer() {
           <div className="w-16">
             {/* Empty space to balance the layout */}
           </div>
+        </div>
+
+        <div className="mt-4 flex justify-center">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="text-neon-blue border-neon-blue bg-transparent hover:bg-neon-blue/10 flex items-center gap-2">
+                <Music size={16} />
+                <span>Suggest Songs</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="glass-card border-neon-blue/30">
+              <DialogHeader>
+                <DialogTitle className="text-center text-neon-blue">Suggest a Song for the Party</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSuggestionSubmit} className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Artist - Song Title"
+                    value={songSuggestion}
+                    onChange={(e) => setSongSuggestion(e.target.value)}
+                    className="bg-black/50 border-white/20 text-white"
+                  />
+                  <Button type="submit" className="bg-neon-blue hover:bg-neon-blue/80">
+                    Add
+                  </Button>
+                </div>
+                {suggestions.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-white/70 text-sm mb-2">Suggested Songs:</h4>
+                    <ul className="space-y-1 max-h-40 overflow-y-auto">
+                      {suggestions.map((song, index) => (
+                        <li key={index} className="text-neon-pink text-sm p-2 rounded bg-black/20">
+                          {song}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

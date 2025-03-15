@@ -62,7 +62,9 @@ export const createConfetti = (container: HTMLElement, count = 50) => {
     
     // Remove confetti after animation completes
     setTimeout(() => {
-      container.removeChild(confetti);
+      if (container.contains(confetti)) {
+        container.removeChild(confetti);
+      }
     }, 8000 + (Math.random() * 5000));
   }
 };
@@ -129,4 +131,26 @@ export const useTypewriterEffect = (text: string, speed = 100, delay = 0) => {
   }, [text, speed, delay]);
   
   return displayText;
+};
+
+/**
+ * Creates a fade-out effect for page transitions
+ */
+export const useFadeEffect = (duration = 1000) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    setIsVisible(false);
+    
+    const timeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    
+    return () => clearTimeout(timeout);
+  }, []);
+  
+  return {
+    isVisible,
+    fadeClass: `transition-opacity duration-${duration} ${isVisible ? 'opacity-100' : 'opacity-0'}`
+  };
 };
