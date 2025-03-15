@@ -21,17 +21,6 @@ const Index = () => {
   targetDate.setMonth(targetDate.getMonth() + 2);
   
   useEffect(() => {
-    // Add fade-in effect to the entire page
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-      mainElement.classList.add('opacity-0');
-      
-      setTimeout(() => {
-        mainElement.classList.add('transition-opacity', 'duration-1000');
-        mainElement.classList.remove('opacity-0');
-      }, 200);
-    }
-    
     // Smooth scroll for anchor links
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
